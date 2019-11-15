@@ -983,7 +983,7 @@ declare namespace Eris {
     public limit?: number;
     public constructor(baseObject: new (...args: any[]) => T, limit?: number);
     public add(obj: T, extra?: any, replace?: boolean): T;
-    public find(func: (i: T) => boolean): T;
+    public find(func: (i: T) => boolean): T | undefined;
     public random(): T;
     public filter(func: (i: T) => boolean): T[];
     public map<R>(func: (i: T) => R): R[];
