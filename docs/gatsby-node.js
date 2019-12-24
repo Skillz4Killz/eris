@@ -231,7 +231,8 @@ exports.createPages = ({actions, graphql}) => {
                 component: path.resolve("src/templates/docs.js"),
                 context: {
                     members: members,
-                    node: edge.node
+                    node: edge.node,
+                    allEdges: result.data.allDocumentationJs.edges
                 }
             });
         }

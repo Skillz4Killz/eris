@@ -4,32 +4,36 @@ import { Link, graphql } from "gatsby"
 import Layout from "../components/layout"
 import Image from "../components/image"
 import SEO from "../components/seo"
+import Sidebar from "../components/sidebar"
 
-const IndexPage = props => (
-  <Layout>
-    {console.log(props)}
-    <SEO title="Home" />
-    <h1>Hi people</h1>
-    <p>Welcome to your Eris Documentation.</p>
-    {props.data.allDocumentationJs.edges
-      .filter(e => e.node.name && e.node.kind === "class")
-      // Alphabetize
-      .sort((a, b) => {
-        if (a.node.name < b.node.name) return -1
-        if (a.node.name > b.node.name) return 1
-        return 0
-      })
-      .map((edge, index) => (
-        <div key={index}>
-          <Link to={edge.node.name}>{edge.node.name}</Link>
+const IndexPage = props => {
+  const edges = props.data.allDocumentationJs.edges
+    .filter(e => e.node.name && e.node.kind === "class")
+    // Alphabetize
+    .sort((a, b) => {
+      if (a.node.name < b.node.name) return -1
+      if (a.node.name > b.node.name) return 1
+      return 0
+    })
+  return (
+    <Layout>
+      <SEO title="Home" />
+      <Sidebar data={edges}>
+        <h1>Hi people</h1>
+        <p>Welcome to your Eris Documentation.</p>
+        {edges.map((edge, index) => (
+          <div key={index}>
+            <Link to={`/${edge.node.name}`}>{edge.node.name}</Link>
+          </div>
+        ))}
+        <p>Now go build something great.</p>
+        <div style={{ maxWidth: `300px`, marginBottom: `1.45rem` }}>
+          <Image />
         </div>
-      ))}
-    <p>Now go build something great.</p>
-    <div style={{ maxWidth: `300px`, marginBottom: `1.45rem` }}>
-      <Image />
-    </div>
-  </Layout>
-)
+      </Sidebar>
+    </Layout>
+  )
+}
 
 export default IndexPage
 
