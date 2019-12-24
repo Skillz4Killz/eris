@@ -12,44 +12,41 @@ import { Link } from "gatsby"
 
 const drawerWidth = 240
 
-export default function PermanentDrawerLeft(props) {
-  return (
-    <div style={{ display: "flex" }}>
-      <CssBaseline />
-      <AppBar
-        position="fixed"
-        style={{
-          width: `calc(100% - ${drawerWidth - 25}px)`,
-          // marginLeft: `calc(100% - ${drawerWidth}px)`,
-        }}
-      >
-        <Toolbar>
-          <Typography variant="h6" noWrap>
-            Eris Documentation
-          </Typography>
-        </Toolbar>
-      </AppBar>
-      <Drawer style={{ width: drawerWidth }} variant="permanent">
-        <div style={{ padding: "30px" }} />
-        <Divider />
-        <List>
-          {props.data.map((edge, index) => (
-            <Link
-              to={edge.node.name}
-              key={index}
-              style={{ textDecoration: "none" }}
-            >
-              <ListItem button>
-                <ListItemText primary={edge.node.name} />
-              </ListItem>
-            </Link>
-          ))}
-        </List>
-      </Drawer>
-      <main style={{ flexGrow: 1 }}>
-        <div style={{ padding: "50px" }} />
-        <div>{props.children}</div>
-      </main>
-    </div>
-  )
-}
+export default props => (
+  <div style={{ display: "flex" }}>
+    <CssBaseline />
+    <AppBar
+      position="fixed"
+      style={{
+        width: `calc(100% - ${drawerWidth - 25}px)`,
+      }}
+    >
+      <Toolbar>
+        <Typography variant="h6" noWrap>
+          Eris Documentation
+        </Typography>
+      </Toolbar>
+    </AppBar>
+    <Drawer style={{ width: drawerWidth }} variant="permanent">
+      <div style={{ padding: "30px" }} />
+      <Divider />
+      <List>
+        {props.data.map((edge, index) => (
+          <Link
+            to={edge.node.name}
+            key={index}
+            style={{ textDecoration: "none" }}
+          >
+            <ListItem button>
+              <ListItemText primary={edge.node.name} />
+            </ListItem>
+          </Link>
+        ))}
+      </List>
+    </Drawer>
+    <main style={{ flexGrow: 1 }}>
+      <div style={{ padding: "50px" }} />
+      <div>{props.children}</div>
+    </main>
+  </div>
+)
