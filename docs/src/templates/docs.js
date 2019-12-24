@@ -13,6 +13,9 @@ export default data => {
       if (a.name > b.name) return 1
       return 0
     })
+
+  const extendsTag = context.node.tags.find(tag => tag.title === "extends")
+  console.log(extendsTag)
   return (
     <Layout>
       <SEO title="Home" />
@@ -26,50 +29,70 @@ export default data => {
             return 0
           })}
       >
-        <h1>{context.node.name}</h1>
+        <h1>
+          {context.node.name}
+          {extendsTag ? (
+            <span>
+              <span style={{ fontSize: '22px'}}> extends</span>
+              <span> {extendsTag.name}</span>
+            </span>
+          ) : null}
+        </h1>
         <p>{context.node.description.internal.content}</p>
 
         {tags.length ? <h2>Properties</h2> : null}
 
-        {tags.map((tag, index) => {
-          let type = tag.type
-            ? tag.type.type === "UnionType"
-              ? `${tag.type.elements.map(e => e.name).join(" | ")}`
-              : `${tag.type.name || tag.type.expression.name}`
-            : ""
+        <div
+          style={{
+            display: "flex",
+            flexFlow: "wrap",
+            justifyContent: "space-between",
+          }}
+        >
+          {tags.map((tag, index) => {
+            let type = tag.type
+              ? tag.type.type === "UnionType"
+                ? `${tag.type.elements.map(e => e.name).join(" | ")}`
+                : `${tag.type.name || tag.type.expression.name}`
+              : ""
 
-          if (type === "Collection") {
-            type = `Collection<${tag.type.applications
-              .map(a => a.name)
-              .join("|")}>`
-          } else
-            type = (
-              <a
-                href={`https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/${type}`}
-              >
-                {type}
-              </a>
-            )
+            if (type === "Collection") {
+              type = `Collection<${tag.type.applications
+                .map(a => a.name)
+                .join("|")}>`
+            } else
+              type = (
+                <a
+                  href={`https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/${type}`}
+                >
+                  {type}
+                </a>
+              )
 
-          return (
-            <div key={index}>
-              <h3 style={{ marginBottom: "10px" }}>.{tag.name}</h3>
-              <div
-                style={{
-                  borderLeft: "2px solid tomato",
-                  marginBottom: "20px",
-                }}
-              >
-                <p style={{ margin: "0px", marginLeft: "5px", padding: "0px" }}>
-                  {tag.description}
-                </p>
-                <p style={{ margin: "0px", marginLeft: "5px", padding: "0px" }}>
-                  Type: {type}
-                </p>
+            return (
+              <div key={index} style={{ flex: "50%", paddingLeft: "5px" }}>
+                <h3 style={{ marginBottom: "10px" }}>.{tag.name}</h3>
+                <div
+                  style={{
+                    borderLeft: "2px solid tomato",
+                    marginBottom: "20px",
+                  }}
+                >
+                  <p
+                    style={{ margin: "0px", marginLeft: "5px", padding: "0px" }}
+                  >
+                    {tag.description}
+                  </p>
+                  <p
+                    style={{ margin: "0px", marginLeft: "5px", padding: "0px" }}
+                  >
+                    Type: {type}
+                  </p>
+                </div>
               </div>
-            </div>
-          )
-        })}
+            )
+          })}
+        </div>
 
         {context.members.length ? <h2>Methods</h2> : null}
 
@@ -120,7 +143,7 @@ export default data => {
                 </h3>
                 <div
                   style={{
-                    borderLeft: "2px solid #4e98d8",
+                    borderLeft: "3px solid #4e98d8",
                     marginBottom: "20px",
                     marginLeft: "15px",
                     marginTop: "10px",
@@ -141,7 +164,7 @@ export default data => {
                         <tr
                           style={{
                             borderStyle: "none",
-                            backgroundColor: "#4e98d8",
+                            backgroundColor: "#E0E0E0",
                             color: "black",
                           }}
                         >
