@@ -23,7 +23,7 @@ export default props => (
     >
       <Toolbar>
         <Typography variant="h6" noWrap>
-          Eris Documentation
+          <Link to="/">Eris Documentation</Link>
         </Typography>
       </Toolbar>
     </AppBar>
