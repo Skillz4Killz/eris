@@ -221,7 +221,6 @@ export default data => {
                               /\[([^\]]+)]\(([^\)]+)\)/g,
                               '<a href="$2" target="blank" rel="noopener noreferrer">$1</a>'
                             )
-                            console.log(descriptiont)
 
                             return (
                               <tr key={tindex}>
