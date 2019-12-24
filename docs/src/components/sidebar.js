@@ -1,5 +1,4 @@
 import React from "react"
-import { makeStyles } from "@material-ui/core/styles"
 import Drawer from "@material-ui/core/Drawer"
 import CssBaseline from "@material-ui/core/CssBaseline"
 import AppBar from "@material-ui/core/AppBar"
@@ -13,56 +12,30 @@ import { Link } from "gatsby"
 
 const drawerWidth = 240
 
-const useStyles = makeStyles(theme => ({
-  root: {
-    display: "flex",
-  },
-  appBar: {
-    width: `calc(100% - ${drawerWidth}px)`,
-    marginLeft: drawerWidth,
-  },
-  drawer: {
-    width: drawerWidth,
-    flexShrink: 0,
-  },
-  drawerPaper: {
-    width: drawerWidth,
-  },
-  toolbar: theme.mixins.toolbar,
-  content: {
-    flexGrow: 1,
-    backgroundColor: theme.palette.background.default,
-    padding: theme.spacing(3),
-  },
-}))
-
 export default function PermanentDrawerLeft(props) {
-  const classes = useStyles()
-
   return (
-    <div className={classes.root}>
+    <div style={{ display: "flex" }}>
       <CssBaseline />
-      <AppBar position="fixed" className={classes.appBar}>
+      <AppBar
+        position="fixed"
+        style={{
+          width: `calc(100% - ${drawerWidth - 25}px)`,
+          // marginLeft: `calc(100% - ${drawerWidth}px)`,
+        }}
+      >
         <Toolbar>
           <Typography variant="h6" noWrap>
             Eris Documentation
           </Typography>
         </Toolbar>
       </AppBar>
-      <Drawer
-        className={classes.drawer}
-        variant="permanent"
-        classes={{
-          paper: classes.drawerPaper,
-        }}
-        anchor="left"
-      >
-        <div className={classes.toolbar} />
+      <Drawer style={{ width: drawerWidth }} variant="permanent">
+        <div style={{ padding: "30px" }} />
         <Divider />
         <List>
           {props.data.map((edge, index) => (
             <Link
-              to={`/${edge.node.name}`}
+              to={edge.node.name}
               key={index}
               style={{ textDecoration: "none" }}
             >
@@ -73,8 +46,8 @@ export default function PermanentDrawerLeft(props) {
           ))}
         </List>
       </Drawer>
-      <main className={classes.content}>
-        <div className={classes.toolbar} />
+      <main style={{ flexGrow: 1 }}>
+        <div style={{ padding: "50px" }} />
         <div>{props.children}</div>
       </main>
     </div>
