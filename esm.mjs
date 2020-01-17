@@ -7,7 +7,6 @@ export default function(token, options) {
 export const {
   Base,
   Bucket,
-  Call,
   CategoryChannel,
   Channel,
   Client,
@@ -16,7 +15,6 @@ export const {
   CommandClient,
   Constants,
   ExtendedUser,
-  GroupChannel,
   Guild,
   GuildChannel,
   GuildIntegration,
@@ -27,7 +25,6 @@ export const {
   Permission,
   PermissionOverwrite,
   PrivateChannel,
-  Relationship,
   Role,
   Shard,
   SharedStream,
