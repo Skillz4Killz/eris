@@ -22,8 +22,8 @@ declare namespace Eris {
 
   // TODO there's also toJSON(): JSONCache, though, SimpleJSON should suffice
 
-  type TextableChannel = TextChannel | PrivateChannel | GroupChannel | NewsChannel;
-  type AnyChannel = AnyGuildChannel | PrivateChannel | GroupChannel;
+  type TextableChannel = TextChannel | PrivateChannel | NewsChannel;
+  type AnyChannel = AnyGuildChannel | PrivateChannel;
   type AnyGuildChannel = TextChannel | VoiceChannel | CategoryChannel | StoreChannel | NewsChannel;
 
   interface CreateInviteOptions {
@@ -61,14 +61,6 @@ declare namespace Eris {
     removeMessageReactions(messageID: string): Promise<void>;
     deleteMessage(messageID: string, reason?: string): Promise<void>;
     unsendMessage(messageID: string): Promise<void>;
-  }
-
-  interface OldCall {
-    participants: string[];
-    endedTimestamp?: number;
-    ringing: string[];
-    region: string;
-    unavailable: boolean;
   }
 
   interface OldGuildChannel {
@@ -396,30 +388,6 @@ declare namespace Eris {
     id: string;
   }
 
-  interface UserSettings {
-    theme: string;
-    status: string;
-    show_current_game: boolean;
-    restricted_guilds: string[];
-    render_reactions: boolean;
-    render_embeds: boolean;
-    message_display_compact: boolean;
-    locale: string;
-    inline_embed_media: boolean;
-    inline_attachment_media: boolean;
-    guild_positions: string[];
-    friend_source_flags: {
-      all: boolean; // not sure about other keys, abal heeeelp
-    };
-    explicit_content_filter: number;
-    enable_tts_command: boolean;
-    developer_mode: boolean;
-    detect_platform_accounts: boolean;
-    default_guilds_restricted: boolean;
-    convert_emojis: boolean;
-    afk_timeout: number;
-  }
-
   interface GuildSettings {
     suppress_everyone: boolean;
     muted: boolean;
@@ -707,20 +675,12 @@ declare namespace Eris {
 
   interface EventListeners<T> {
     (event: "ready" | "disconnect", listener: () => void): T;
-    (event: "callCreate" | "callRing" | "callDelete", listener: (call: Call) => void): T;
-    (event: "callUpdate", listener: (call: Call, oldCall: OldCall) => void): T;
     (event: "channelCreate" | "channelDelete", listener: (channel: AnyChannel) => void): T;
     (
       event: "channelPinUpdate",
       listener: (channel: TextableChannel, timestamp: number, oldTimestamp: number) => void
     ): T;
-    (
-      event: "channelRecipientAdd" | "channelRecipientRemove",
-      listener: (channel: GroupChannel, user: User) => void
-    ): T;
     (event: "channelUpdate", listener: (channel: AnyGuildChannel, oldChannel: OldGuildChannel) => void): T;
-    (event: "friendSuggestionCreate", listener: (user: User, reasons: FriendSuggestionReasons) => void): T;
-    (event: "friendSuggestionDelete", listener: (user: User) => void): T;
     (event: "guildAvailable" | "guildBanAdd" | "guildBanRemove", listener: (guild: Guild, user: User) => void): T;
     (event: "guildDelete" | "guildUnavailable" | "guildCreate", listener: (guild: Guild) => void): T;
     (event: "guildEmojisUpdate", listener: (guild: Guild, emojis: Emoji[], oldEmojis: Emoji[]) => void): T;
@@ -744,13 +704,8 @@ declare namespace Eris {
     ): T;
     (event: "messageUpdate", listener: (message: Message, oldMessage?: OldMessage) => void
     ): T;
-    (event: "presenceUpdate", listener: (other: Member | Relationship, oldPresence?: OldPresence) => void): T;
+    (event: "presenceUpdate", listener: (other: Member, oldPresence?: OldPresence) => void): T;
     (event: "rawWS" | "unknown", listener: (packet: RawPacket, id: number) => void): T;
-    (event: "relationshipAdd" | "relationshipRemove", listener: (relationship: Relationship) => void): T;
-    (
-      event: "relationshipUpdate",
-      listener: (relationship: Relationship, oldRelationship: { type: number }) => void
-    ): T;
     (event: "typingStart", listener: (channel: TextableChannel, user: User) => void): T;
     (event: "unavailableGuildCreate", listener: (guild: UnavailableGuild) => void): T;
     (
@@ -792,7 +747,6 @@ declare namespace Eris {
     guilds: Collection<Guild>;
     privateChannelMap: { [s: string]: string };
     privateChannels: Collection<PrivateChannel>;
-    groupChannels: Collection<GroupChannel>;
     voiceConnections: Collection<VoiceConnection>;
     guildShardMap: { [s: string]: number };
     startTime: number;
@@ -800,10 +754,6 @@ declare namespace Eris {
     uptime: number;
     user: ExtendedUser;
     users: Collection<User>;
-    relationships: Collection<Relationship>;
-    userGuildSettings: { [s: string]: GuildSettings };
-    userSettings: UserSettings;
-    notes: { [s: string]: string };
     constructor(token: string, options?: ClientOptions);
     connect(): Promise<void>;
     getGateway(): Promise<{ url: string }>;
@@ -882,7 +832,7 @@ declare namespace Eris {
         parentID?: string;
       },
       reason?: string
-    ): Promise<GroupChannel | AnyGuildChannel>;
+    ): Promise<AnyGuildChannel>;
     editChannelPosition(channelID: string, position: number): Promise<void>;
     deleteChannel(channelID: string, reason?: string): Promise<void>;
     sendChannelTyping(channelID: string): Promise<void>;
@@ -941,7 +891,6 @@ declare namespace Eris {
     getSelf(): Promise<ExtendedUser>;
     editSelf(options: { username?: string; avatar?: string }): Promise<ExtendedUser>;
     getDMChannel(userID: string): Promise<PrivateChannel>;
-    createGroupChannel(userIDs: string[]): Promise<GroupChannel>;
     getMessage(channelID: string, messageID: string): Promise<Message>;
     getMessages(
       channelID: string,
@@ -996,63 +945,6 @@ declare namespace Eris {
     deleteGuild(guildID: string): Promise<void>;
     leaveGuild(guildID: string): Promise<void>;
     getOAuthApplication(appID?: string): Promise<OAuthApplicationInfo>;
-    addRelationship(userID: string, block?: boolean): Promise<void>;
-    removeRelationship(userID: string): Promise<void>;
-    addGroupRecipient(groupID: string, userID: string): Promise<void>;
-    removeGroupRecipient(groupID: string, userID: string): Promise<void>;
-    getUserProfile(userID: string): Promise<UserProfile>;
-    editUserNote(userID: string, note: string): Promise<void>;
-    deleteUserNote(userID: string): Promise<void>;
-    getSelfConnections(): Promise<Connection[]>;
-    editSelfConnection(
-      platform: string,
-      id: string,
-      data: { friendSync: boolean; visibility: number }
-    ): Promise<Connection>;
-    deleteSelfConnection(platform: string, id: string): Promise<void>;
-    getSelfSettings(): Promise<UserSettings>;
-    editSelfSettings(data: UserSettings): Promise<UserSettings>;
-    getSelfMFACodes(
-      password: string,
-      regenerate?: boolean
-    ): Promise<{ backup_codes: { code: string; consumed: boolean }[] }>;
-    enableSelfMFATOTP(
-      secret: string,
-      code: string
-    ): Promise<{ token: string; backup_codes: { code: string; consumed: boolean }[] }>;
-    disableSelfMFATOTP(code: string): Promise<{ token: string }>;
-    getSelfBilling(): Promise<{
-      premium_subscription?: {
-        status: number;
-        ended_at?: string;
-        canceled_at?: string;
-        created_at: string;
-        current_period_end?: string;
-        current_period_start?: string;
-        plan: string;
-      };
-      payment_source?: {
-        type: string;
-        brand: string;
-        invalid: boolean;
-        last_4: number;
-        expires_year: number;
-        expires_month: number;
-      };
-      payment_gateway?: string;
-    }>;
-    getSelfPayments(): Promise<
-      {
-        status: number;
-        amount_refunded: number;
-        description: string;
-        created_at: string; // date
-        currency: string;
-        amount: number;
-      }[]
-    >;
-    addSelfPremiumSubscription(token: string, plan: string): Promise<void>;
-    deleteSelfPremiumSubscription(): Promise<void>;
     getRESTChannel(channelID: string): Promise<AnyChannel>;
     getRESTGuild(guildID: string): Promise<Guild>;
     getRESTGuilds(limit?: number, before?: string, after?: string): Promise<Guild[]>;
@@ -1173,19 +1065,6 @@ declare namespace Eris {
     remove(obj: T | { id: string }): T;
   }
 
-  export class Call extends Base {
-    id: string;
-    createdAt: number;
-    channel: GroupChannel;
-    voiceStates: Collection<VoiceState>;
-    participants: string[];
-    endedTimestamp?: number;
-    ringing?: string[];
-    region?: string;
-    unavailable: boolean;
-    constructor(data: BaseData, channel: GroupChannel);
-  }
-
   export class Channel extends Base {
     id: string;
     mention: string;
@@ -1199,19 +1078,6 @@ declare namespace Eris {
     email: string;
     verified: boolean;
     mfaEnabled: boolean;
-  }
-
-  export class GroupChannel extends PrivateTextableChannel {
-    type: 3;
-    recipients: Collection<User>;
-    name: string;
-    icon?: string;
-    iconURL?: string;
-    ownerID: string;
-    edit(options: { name?: string; icon?: string; ownerID?: string }): Promise<GroupChannel>;
-    addRecipient(userID: string): Promise<void>;
-    removeRecipient(userID: string): Promise<void>;
-    dynamicIconURL(format: string, size: number): string;
   }
 
   export class Guild extends Base {
@@ -1585,8 +1451,6 @@ declare namespace Eris {
     lastMessageID: string;
     recipient: User;
     messages: Collection<Message>;
-    ring(recipient: string[]): void;
-    syncCall(): void;
     leave(): Promise<void>;
     sendTyping(): Promise<void>;
     getMessage(messageID: string): Promise<Message>;
@@ -1611,15 +1475,6 @@ declare namespace Eris {
   }
   export class PrivateChannel extends PrivateTextableChannel implements Textable {
     type: 1;
-  }
-
-  export class Relationship {
-    id: string;
-    user: User;
-    type: number;
-    status: string;
-    game?: GamePresence;
-    constructor(data: BaseData, client: Client);
   }
 
   export class Role extends Base {
@@ -1665,11 +1520,7 @@ declare namespace Eris {
     constructor(data: BaseData, client: Client);
     dynamicAvatarURL(format?: string, size?: number): string;
     getDMChannel(): Promise<PrivateChannel>;
-    addRelationship(block?: boolean): Promise<void>;
-    removeRelationship(): Promise<void>;
     getProfile(): Promise<UserProfile>;
-    editNote(note: string): Promise<void>;
-    deleteNote(): Promise<void>;
   }
 
   export class VoiceState extends Base implements NestedJSON {
