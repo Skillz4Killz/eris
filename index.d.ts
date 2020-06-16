@@ -5,10 +5,22 @@ import { IncomingMessage } from "http";
 
 declare function Eris(token: string, options?: Eris.ClientOptions): Eris.Client;
 
+
 declare namespace Eris {
   // TODO good hacktoberfest PR: implement ShardManager, RequestHandler and other stuff
 
   export const VERSION: string;
+
+  export enum ChannelTypes {
+    GuildText = 0,
+    DM = 1,
+    Voice = 2,
+    GroupDM = 3,
+    Category = 4,
+    News = 5,
+    Store = 6
+  }
+
   interface JSONCache {
     [s: string]: any;
   }
@@ -80,7 +92,7 @@ declare namespace Eris {
     parentID?: string;
     topic?: string;
     rateLimitPerUser?: number;
-    type: 0 | 2 | 4 | 5 | 6;
+    type: ChannelTypes.GuildText | ChannelTypes.Voice | ChannelTypes.Category | ChannelTypes.News | ChannelTypes.Store;
     bitrate?: number;
     userLimit?: number;
   }
@@ -600,7 +612,7 @@ declare namespace Eris {
   }
   interface PartialChannel {
     id?: number;
-    type: number;
+    type: ChannelTypes;
     permission_overwrites?: Overwrite[];
     name?: string;
     topic?: string;
@@ -958,53 +970,53 @@ declare namespace Eris {
     createChannel(
       guildID: string,
       name: string,
-      type: 0,
+      type: ChannelTypes.GuildText,
       reason?: string,
       options?: CreateChannelOptions | string
     ): Promise<TextChannel>;
     createChannel(
       guildID: string,
       name: string,
-      type: 2,
+      type: ChannelTypes.Voice,
       reason?: string,
       options?: CreateChannelOptions | string
     ): Promise<VoiceChannel>;
     createChannel(
       guildID: string,
       name: string,
-      type: 4,
+      type: ChannelTypes.Category,
       reason?: string,
       options?: CreateChannelOptions | string
     ): Promise<CategoryChannel>;
     createChannel(
       guildID: string,
       name: string,
-      type?: number,
+      type?: ChannelTypes,
       reason?: string,
       options?: CreateChannelOptions | string
     ): Promise<unknown>;
     createChannel(
       guildID: string,
       name: string,
-      type: 0,
+      type: ChannelTypes.GuildText,
       options?: CreateChannelOptions
     ): Promise<TextChannel>;
     createChannel(
       guildID: string,
       name: string,
-      type: 2,
+      type: ChannelTypes.Voice,
       options?: CreateChannelOptions
     ): Promise<VoiceChannel>;
     createChannel(
       guildID: string,
       name: string,
-      type: 4,
+      type: ChannelTypes.Category,
       options?: CreateChannelOptions
     ): Promise<CategoryChannel>;
     createChannel(
       guildID: string,
       name: string,
-      type?: number,
+      type?: ChannelTypes,
       options?: CreateChannelOptions
     ): Promise<unknown>;
     editChannel(
@@ -1335,7 +1347,7 @@ declare namespace Eris {
   export class Channel extends Base {
     id: string;
     mention: string;
-    type: 0 | 1 | 2 | 3 | 4 | 5 | 6;
+    type: ChannelTypes;
     client: Client;
     createdAt: number;
     constructor(data: BaseData);
@@ -1406,14 +1418,14 @@ declare namespace Eris {
     dynamicBannerURL(format?: string, size?: number): string;
     dynamicSplashURL(format?: string, size?: number): string;
     createChannel(name: string): Promise<TextChannel>;
-    createChannel(name: string, type: 0, reason?: string, options?: CreateChannelOptions | string): Promise<TextChannel>;
-    createChannel(name: string, type: 2, reason?: string, options?: CreateChannelOptions | string): Promise<VoiceChannel>;
-    createChannel(name: string, type: 4, reason?: string, options?: CreateChannelOptions | string): Promise<CategoryChannel>;
+    createChannel(name: string, type: ChannelTypes.GuildText, reason?: string, options?: CreateChannelOptions | string): Promise<TextChannel>;
+    createChannel(name: string, type: ChannelTypes.Voice, reason?: string, options?: CreateChannelOptions | string): Promise<VoiceChannel>;
+    createChannel(name: string, type: ChannelTypes.Category, reason?: string, options?: CreateChannelOptions | string): Promise<CategoryChannel>;
     createChannel(name: string, type?: number, reason?: string, options?: CreateChannelOptions | string): Promise<unknown>;
-    createChannel(name: string, type: 0, options?: CreateChannelOptions): Promise<TextChannel>;
-    createChannel(name: string, type: 2, options?: CreateChannelOptions): Promise<VoiceChannel>;
-    createChannel(name: string, type: 4, options?: CreateChannelOptions): Promise<CategoryChannel>;
-    createChannel(name: string, type?: number, options?: CreateChannelOptions): Promise<unknown>;
+    createChannel(name: string, type: ChannelTypes.GuildText, options?: CreateChannelOptions): Promise<TextChannel>;
+    createChannel(name: string, type: ChannelTypes.Voice, options?: CreateChannelOptions): Promise<VoiceChannel>;
+    createChannel(name: string, type: ChannelTypes.Category, options?: CreateChannelOptions): Promise<CategoryChannel>;
+    createChannel(name: string, type?: ChannelTypes, options?: CreateChannelOptions): Promise<unknown>;
     createEmoji(options: { name: string; image: string; roles?: string[] }, reason?: string): Promise<Emoji>;
     editEmoji(emojiID: string, options: { name: string; roles?: string[] }, reason?: string): Promise<Emoji>;
     deleteEmoji(emojiID: string, reason?: string): Promise<void>;
@@ -1474,7 +1486,7 @@ declare namespace Eris {
   }
 
   export class GuildChannel extends Channel {
-    type: 0 | 2 | 4 | 5 | 6;
+    type: ChannelTypes.GuildText | ChannelTypes.Voice | ChannelTypes.Category | ChannelTypes.News | ChannelTypes.Store;
     guild: Guild;
     parentID?: string;
     name: string;
@@ -1523,7 +1535,7 @@ declare namespace Eris {
   }
 
   export class CategoryChannel extends GuildChannel {
-    type: 4;
+    type: ChannelTypes.Category;
     channels: Collection<Exclude<AnyGuildChannel, CategoryChannel>>;
     edit(
       options: {
@@ -1540,7 +1552,7 @@ declare namespace Eris {
   }
 
   export class StoreChannel extends GuildChannel {
-    type: 6;
+    type: ChannelTypes.Store;
     edit(
       options: {
         name?: string;
@@ -1556,7 +1568,7 @@ declare namespace Eris {
   }
 
   export class TextChannel extends GuildChannel implements GuildTextable, Invitable {
-    type: 0 | 5;
+    type: ChannelTypes.GuildText | ChannelTypes.News;
     rateLimitPerUser: number;
     topic?: string;
     lastMessageID: string;
@@ -1606,7 +1618,7 @@ declare namespace Eris {
 
   // News channel rate limit is always 0
   export class NewsChannel extends TextChannel {
-    type: 5;
+    type: ChannelTypes.News;
     rateLimitPerUser: 0;
     messages: Collection<Message<NewsChannel>>;
     crosspostMessage(messageID: string): Promise<Message<NewsChannel>>;
@@ -1620,7 +1632,7 @@ declare namespace Eris {
   }
 
   export class VoiceChannel extends GuildChannel implements Invitable {
-    type: 2;
+    type: ChannelTypes.Voice;
     bitrate?: number;
     userLimit?: number;
     voiceMembers: Collection<Member>;
@@ -1675,7 +1687,7 @@ declare namespace Eris {
     channel: {
       id: string;
       name?: string;
-      type: 0 | 2 | 3 | 4 | 5 | 6;
+      type: ChannelTypes.GuildText | ChannelTypes.Voice | ChannelTypes.GroupDM | ChannelTypes.Category | ChannelTypes.News | ChannelTypes.Store;
     };
     inviter?: User;
     delete(reason?: string): Promise<void>;
@@ -1687,7 +1699,7 @@ declare namespace Eris {
     channel: {
       id: string;
       name: string;
-      type: 0 | 2 | 4 | 5 | 6;
+      type: ChannelTypes.GuildText | ChannelTypes.Voice | ChannelTypes.Category | ChannelTypes.News | ChannelTypes.Store;
     };
     guild: {
       id: string;
@@ -1723,7 +1735,7 @@ declare namespace Eris {
       id: string;
       name?: string;
       icon?: string;
-      type: 3;
+      type: ChannelTypes.GroupDM;
     };
   }
 
@@ -1837,7 +1849,7 @@ declare namespace Eris {
   }
 
   export class PrivateChannel extends Channel implements Textable {
-    type: 1 | 3;
+    type: ChannelTypes.DM | ChannelTypes.GroupDM;
     recipient: User;
     lastMessageID: string;
     messages: Collection<Message<PrivateChannel>>;
@@ -1866,7 +1878,7 @@ declare namespace Eris {
   }
 
   export class GroupChannel extends PrivateChannel {
-    type: 3;
+    type: ChannelTypes.GroupDM;
     recipients: Collection<User>;
     name: string;
     icon?: string;
